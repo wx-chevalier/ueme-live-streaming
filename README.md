@@ -24,7 +24,6 @@
     <a href="https://github.com/FE-Kits/uvc-live/issues">Report Bug</a>
     ·
     <a href="https://github.com/FE-Kits/uvc-live/issues">Request Feature</a>
-
   </p>
 </p>
 
