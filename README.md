@@ -14,9 +14,9 @@
   <h3 align="center">uvc-live</h3>
 
   <p align="center">
-    
-基于 UVC 的摄像头控制与直播推流
+    基于 UVC 的摄像头控制与直播推流
     <br />
+
     <a href="https://github.com/FE-Kits/uvc-live"><strong>Explore the docs »</strong></a>
     <br />
     <br />
@@ -25,6 +25,7 @@
     <a href="https://github.com/FE-Kits/uvc-live/issues">Report Bug</a>
     ·
     <a href="https://github.com/FE-Kits/uvc-live/issues">Request Feature</a>
+
   </p>
 </p>
 
