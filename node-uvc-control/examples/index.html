@@ -1,0 +1,201 @@
+<html>
+
+<head>
+
+  <style>
+    body {
+      background: #555;
+    }
+
+    video {
+      object-fit: contain;
+      width: 80%;
+      height: 80%;
+      position: absolute;
+      top: 10%;
+      left: 10%;
+    }
+
+    .controls {
+      height: 100%;
+      width: 240px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .cam-controls .ctrl {
+      margin-bottom: 10px;
+    }
+
+    .cam-controls label {
+      display: block;
+    }
+  </style>
+
+</head>
+
+<body>
+  <video muted autoplay></video>
+  <div class="controls">
+    <select name="camera" id="cam"></select>
+    <div class="cam-controls"></div>
+  </div>
+  <script>
+    const REQUEST = {
+      RC_UNDEFINED: 0x00,
+      SET_CUR: 0x01,
+      GET_CUR: 0x81,
+      GET_MIN: 0x82,
+      GET_MAX: 0x83,
+      GET_RES: 0x84,
+      GET_LEN: 0x85,
+      GET_INFO: 0x86,
+      GET_DEF: 0x87,
+    }
+
+    const FIELD_TYPE = {
+      BOOLEAN: 'BOOLEAN',
+      BITMAP: 'BITMAP',
+      NUMBER: 'NUMBER',
+    }
+
+    const video = document.querySelector('video')
+    const camSelector = document.querySelector('select')
+    const camControls = document.querySelector('.cam-controls')
+
+    async function setup() {
+      let devices
+
+      async function initCamera(deviceId) {
+        if (video.srcObject) {
+          video.srcObject.getVideoTracks()[0].stop()
+        }
+        const constraints = {
+          video: {
+            deviceId: {
+              exact: deviceId,
+            }
+          },
+          audio: false,
+        }
+        const stream = await navigator.mediaDevices.getUserMedia(constraints)
+        video.srcObject = stream
+      }
+      initCamera()
+
+      const _devices = await navigator.mediaDevices.enumerateDevices()
+      devices = _devices.filter(device => device.kind === 'videoinput')
+      camSelector.innerHTML = devices.map(device => `<option value=${device.deviceId}>${device.label}</option>`)
+      console.log(devices)
+
+      camSelector.addEventListener('change', (e) => {
+        initCamera(camSelector.value)
+      })
+
+      const supportedControls = await fetch('/supported-controls').then(res => res.json())
+      const controlDescriptions = await Promise.all(supportedControls.map(name => {
+        return fetch(`/describe/${name}`).then(res => res.json())
+      }))
+      console.log(controlDescriptions)
+
+      const camControlsHTML = await Promise.all(controlDescriptions.map(async ctrl => {
+
+        let currentVal = await fetch(`/get/${ctrl.name}`).then(res => res.json())
+        console.log('currentVal', ctrl.name, currentVal)
+
+        const fieldControlsHTML = await Promise.all(ctrl.fields.map(async (field, i) => {
+          // console.log(field)
+          const fieldVal = currentVal[field.name]
+          const id = `${ctrl.name}-${field.name}`
+
+          if (ctrl.requests.indexOf(REQUEST.GET_MIN) !== -1) {
+            try {
+              const minMax = await fetch(`/range/${ctrl.name}`).then(res => res.json())
+              return `<div class='range ctrl'><label for='${id}'>${field.name}</label><input id='${id}' type='range' min='${minMax.min}' max='${minMax.max}' value='${fieldVal}'></input></div>`
+            } catch (e) {
+              return ''
+            }
+          } else if (field.options) {
+
+            let options = Object.entries(field.options).map(([key, val]) => {
+              const selected = fieldVal === val ? 'selected' : ''
+              return `<option value='${val}' ${selected}>${key}</option>`
+            })
+            return `<div class='select ctrl'><label for='${id}'>${field.name}</label><select id='${id}'>${options}</select></input></div>`
+
+          } else if (field.type === FIELD_TYPE.BOOLEAN) {
+            return `<div class='bool ctrl'><label for='${id}'>${field.name}</label><input type='checkbox' id='${id}' checked='${fieldVal}'></div>`
+          } else {
+            return ''
+          }
+
+        }))
+        return `<div id='${ctrl.name}'><h3>${ctrl.name}</h3>${fieldControlsHTML.join('')}</div>`
+
+      }))
+      camControls.innerHTML += camControlsHTML.join('')
+
+      const listenForFieldControlChanges = (ctrlEl) => {
+        ctrlEl.addEventListener('change', (e) => {
+          console.log(ctrlEl.id, ctrlEl.value)
+          const [controlId] = ctrlEl.id.split('-')
+          const values = getSiblingFieldValues(controlId).join()
+          fetch(`/set/${controlId}/${values}`, {
+            method: 'POST'
+          })
+        })
+      }
+      document.querySelectorAll('.range.ctrl input').forEach(listenForFieldControlChanges)
+      document.querySelectorAll('.select.ctrl select').forEach(listenForFieldControlChanges)
+      document.querySelectorAll('.bool.ctrl input').forEach(listenForFieldControlChanges)
+
+      // document.querySelectorAll('.range.ctrl input').forEach(ctrlEl => {
+      //   ctrlEl.addEventListener('change', (e) => {
+      //     console.log(ctrlEl.id, ctrlEl.value)
+      //     const [controlId] = ctrlEl.id.split('-')
+      //     const values = getSiblingFieldValues(controlId).join()
+      //     fetch(`/set/${controlId}/${values}`, {
+      //       method: 'POST'
+      //     })
+      //   })
+      // })
+
+      // document.querySelectorAll('.select.ctrl select').forEach(ctrlEl => {
+      //   ctrlEl.addEventListener('change', (e) => {
+      //     console.log(ctrlEl.id, ctrlEl.value)
+      //     const [controlId] = ctrlEl.id.split('-')
+      //     const values = getSiblingFieldValues(controlId).join()
+      //     fetch(`/set/${controlId}/${values}`, {
+      //       method: 'POST'
+      //     })
+      //   })
+      // })
+
+      // document.querySelectorAll('.bool.ctrl input').forEach(ctrlEl => {
+      //   ctrlEl.addEventListener('change', (e) => {
+      //     console.log(ctrlEl.checked)
+      //     const [controlId] = ctrlEl.id.split('-')
+      //     const values = getSiblingFieldValues(controlId).join()
+      //     fetch(`/set/${controlId}/${values}`, {
+      //       method: 'POST'
+      //     })
+      //   })
+      // })
+
+    }
+
+    function getSiblingFieldValues(controlId) {
+      const controlDiv = document.querySelector(`#${controlId}`)
+      const values = []
+      controlDiv.querySelectorAll('.ctrl').forEach(ctrl => {
+        const input = ctrl.querySelector('input, select')
+        if (input.type === 'checkbox') values.push(input.checked ? 1 : 0)
+        else values.push(input.value)
+      })
+      return values
+    }
+    setup()
+  </script>
+</body>
+
+</html>
