@@ -86,7 +86,7 @@
       const _devices = await navigator.mediaDevices.enumerateDevices()
       devices = _devices.filter(device => device.kind === 'videoinput')
       camSelector.innerHTML = devices.map(device => `<option value=${device.deviceId}>${device.label}</option>`)
-      console.log(devices)
+      console.log("devices", devices)
 
       camSelector.addEventListener('change', (e) => {
         initCamera(camSelector.value)

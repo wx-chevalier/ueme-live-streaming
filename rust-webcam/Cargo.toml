@@ -1,0 +1,29 @@
+[package]
+name = "camera_capture"
+version = "0.5.0"
+authors = ["Oliver Schneider <git-spam-no-reply9815368754983@oli-obk.de>"]
+license = "MIT"
+description = "capture webcam images on linux and windows"
+keywords = ["webcam", "v4l", "capture", "camera", "mf"]
+repository = "https://github.com/oli-obk/camera_capture"
+edition = "2018"
+
+build = "build.rs"
+
+[build-dependencies]
+pkg-config = "0.3.14"
+
+[dependencies]
+image = "0.21.1"
+
+[target.'cfg(windows)'.dependencies]
+escapi = "4"
+
+[target.'cfg(unix)'.dependencies]
+rscam = "0.5.4"
+
+[dev-dependencies]
+piston_window = "0.89.0"
+piston-texture = "0.6.0"
+glium = "0.24.0"
+failure = "0.1.5"

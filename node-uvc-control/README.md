@@ -24,7 +24,7 @@ For an interactive demo, run `npm run serve` and open http://localhost:3000.
 
 Use test/discover.js to find the right paramters.
 
-```
+```sh
 $ node test/discover.js
 [ { name: 'Logitech BRIO',
     vendorId: 1133,
@@ -46,19 +46,18 @@ On Windows, use [Zadig](https://sourceforge.net/projects/libwdi/files/zadig/) to
 
 Then, just run `npm install uvc-control`
 
-
 ## API
 
 ```javascript
-const UVCControl = require('uvc-control')
+const UVCControl = require("uvc-control");
 ```
 
 ### new UVCControl(options)
 
-* **options** - object containing options
-* **options.vid** - vendor id of your device
-* **options.pid** - product id of your device
-* **options.deviceAddress** - device address
+- **options** - object containing options
+- **options.vid** - vendor id of your device
+- **options.pid** - product id of your device
+- **options.deviceAddress** - device address
 
 ```javaScript
 const camera = new UVCControl(options)
@@ -69,8 +68,8 @@ const camera = new UVCControl(options)
 Log the names of controls. You can get all controls, or a list of controls supported by the device.
 
 ```javascript
-UVCControl.controls.forEach(name => console.log(name))
-console.log(cam.supportedControls)
+UVCControl.controls.forEach(name => console.log(name));
+console.log(cam.supportedControls);
 ```
 
 ### camera.get( control_name )
@@ -78,7 +77,7 @@ console.log(cam.supportedControls)
 Get the current value of the specified control by name.
 
 ```javascript
-camera.get('sharpness').then(value => console.log('sharpness', value))
+camera.get("sharpness").then(value => console.log("sharpness", value));
 ```
 
 ### camera.range( control_name )
@@ -86,9 +85,9 @@ camera.get('sharpness').then(value => console.log('sharpness', value))
 Get the min and max value of the specified control by name. Some controls do not support this method.
 
 ```javascript
-camera.range('absolute_focus').then(range => {
-  console.log(range) // { min: 0, max: 250 }
-})
+camera.range("absolute_focus").then(range => {
+  console.log(range); // { min: 0, max: 250 }
+});
 ```
 
 ### camera.set( control_name, value )
@@ -96,7 +95,7 @@ camera.range('absolute_focus').then(range => {
 Set the value of the specified control by name.
 
 ```javascript
-camera.set('saturation', 100).then(() => console.log('saturation set!'))
+camera.set("saturation", 100).then(() => console.log("saturation set!"));
 ```
 
 ### camera.set( control_name, ...values )
@@ -104,11 +103,11 @@ camera.set('saturation', 100).then(() => console.log('saturation set!'))
 Some controls have multiple fields. You can pass multiple values that align with the field offsets.
 
 ```javascript
-const pan = 34
-const tilt = 27
-camera.set('absolute_pan_tilt', pan, tilt).then(() => {
-  console.log('absolute_pan_tilt set!')
-})
+const pan = 34;
+const tilt = 27;
+camera.set("absolute_pan_tilt", pan, tilt).then(() => {
+  console.log("absolute_pan_tilt set!");
+});
 ```
 
 ### camera.close()
@@ -116,12 +115,12 @@ camera.set('absolute_pan_tilt', pan, tilt).then(() => {
 Done? Good. Put away your toys and release the USB device.
 
 ```javascript
-camera.close()
+camera.close();
 ```
 
 ### Notes
 
-You can find the full list of specs at the USB Implmentors Forum. Look for a document called *USB Device Class Definition for Video Devices Revision 1.1* at their site here: [http://www.usb.org/developers/docs/devclass_docs/](http://www.usb.org/developers/docs/devclass_docs/) [pdf mirror](http://www.cajunbot.com/wiki/images/8/85/USB_Video_Class_1.1.pdf)
+You can find the full list of specs at the USB Implmentors Forum. Look for a document called _USB Device Class Definition for Video Devices Revision 1.1_ at their site here: [http://www.usb.org/developers/docs/devclass_docs/](http://www.usb.org/developers/docs/devclass_docs/) [pdf mirror](http://www.cajunbot.com/wiki/images/8/85/USB_Video_Class_1.1.pdf)
 
 To debug the USB descriptors, open chrome://usb-internals in Chrome
 
