@@ -18,7 +18,7 @@ camera.get('autoFocus').then(value) => console.log('AutoFocus setting:', value))
 camera.set('brightness', 100).then(() => console.log('Brightness set!'))
 ```
 
-For an interactive demo, run `npm run serve` and open http://localhost:3000.
+For an interactive demo, run `npm run preview` and open http://localhost:3000.
 
 ## Finding Your vendorId / productId
 
@@ -68,7 +68,7 @@ const camera = new UVCControl(options)
 Log the names of controls. You can get all controls, or a list of controls supported by the device.
 
 ```javascript
-UVCControl.controls.forEach(name => console.log(name));
+UVCControl.controls.forEach((name) => console.log(name));
 console.log(cam.supportedControls);
 ```
 
@@ -77,7 +77,7 @@ console.log(cam.supportedControls);
 Get the current value of the specified control by name.
 
 ```javascript
-camera.get("sharpness").then(value => console.log("sharpness", value));
+camera.get("sharpness").then((value) => console.log("sharpness", value));
 ```
 
 ### camera.range( control_name )
@@ -85,7 +85,7 @@ camera.get("sharpness").then(value => console.log("sharpness", value));
 Get the min and max value of the specified control by name. Some controls do not support this method.
 
 ```javascript
-camera.range("absolute_focus").then(range => {
+camera.range("absolute_focus").then((range) => {
   console.log(range); // { min: 0, max: 250 }
 });
 ```
